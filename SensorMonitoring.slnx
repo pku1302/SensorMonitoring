@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="SensorMonitoring.Api/SensorMonitoring.Api.csproj" />
+    <Project Path="SensorMonitoring.Contracts/SensorMonitoring.Contracts.csproj" />
+    <Project Path="SensorMonitoring.Domain/SensorMonitoring.Domain.csproj" />
+    <Project Path="SensorMonitoring.Infrastructure/SensorMonitoring.Infrastructure.csproj" />
+    <Project Path="SensorMonitoring.SensorSimulator/SensorMonitoring.SensorSimulator.csproj" />
+    <Project Path="SensorMonitoring.Wpf/SensorMonitoring.Wpf.csproj" />
+  </Folder>
+</Solution>
