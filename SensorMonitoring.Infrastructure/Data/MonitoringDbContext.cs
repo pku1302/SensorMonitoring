@@ -16,6 +16,9 @@ public class MonitoringDbContext : DbContext
     public DbSet<SensorReading> SensorReadings =>
         Set<SensorReading>();
 
+    public DbSet<Sensor> Sensors =>
+        Set<Sensor>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {
@@ -35,6 +38,9 @@ public class MonitoringDbContext : DbContext
                 entity.Property(x => x.Humidity)
                     .IsRequired();
 
+                entity.Property(x => x.TotalProduction)
+                    .IsRequired();
+
                 entity.Property(x => x.RecordedAt)
                     .IsRequired();
 
@@ -44,6 +50,26 @@ public class MonitoringDbContext : DbContext
                     x.RecordedAt
                 });
             });
+
+        modelBuilder.Entity<Sensor>(entity =>
+        {
+            entity.ToTable("Sensors");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.DeviceId)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.HasIndex(x => x.DeviceId)
+                .IsUnique();
+
+            entity.Property(x => x.CreatedAt)
+                .IsRequired();
+
+            entity.Property(x => x.UpdatedAt)
+                .IsRequired();
+        });
     }
 
 }

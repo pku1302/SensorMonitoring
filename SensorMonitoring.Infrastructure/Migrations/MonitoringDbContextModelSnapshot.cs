@@ -22,6 +22,40 @@ namespace SensorMonitoring.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.Sensor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId")
+                        .IsUnique();
+
+                    b.ToTable("Sensors", (string)null);
+                });
+
             modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorReading", b =>
                 {
                     b.Property<long>("Id")
@@ -43,6 +77,9 @@ namespace SensorMonitoring.Infrastructure.Migrations
 
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
+
+                    b.Property<long>("TotalProduction")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

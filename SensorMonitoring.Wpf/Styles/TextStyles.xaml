@@ -1,0 +1,137 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Status Bar -->
+
+    <Style x:Key="StatusLabelStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="FontSize"
+                Value="13"/>
+
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource SecondaryTextBrush}"/>
+
+    </Style>
+
+
+    <Style x:Key="StatusValueStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="Margin"
+                Value="6,0,0,0"/>
+
+        <Setter Property="FontWeight"
+                Value="SemiBold"/>
+
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource PrimaryTextBrush}"/>
+
+    </Style>
+
+
+    <Style x:Key="CurrentTimeStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="FontSize"
+                Value="13"/>
+
+        <Setter Property="FontWeight"
+                Value="SemiBold"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource PrimaryTextBrush}"/>
+
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+
+    </Style>
+
+
+    <Style x:Key="AppTitleStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="FontSize"
+                Value="24"/>
+
+        <Setter Property="FontWeight"
+                Value="SemiBold"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource PrimaryTextBrush}"/>
+
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+
+    </Style>
+
+
+    <Style x:Key="TopBarSectionTextStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="FontSize"
+                Value="14"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource SecondaryTextBrush}"/>
+
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+
+    </Style>
+
+
+    <!-- Sidebar -->
+
+    <Style x:Key="SidebarSectionTitleStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="Margin"
+                Value="12,18,0,12"/>
+
+        <Setter Property="FontSize"
+                Value="11"/>
+
+        <Setter Property="FontWeight"
+                Value="SemiBold"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource SidebarMutedTextBrush}"/>
+
+    </Style>
+
+
+    <Style x:Key="SidebarFooterTextStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="FontSize"
+                Value="11"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource SidebarMutedTextBrush}"/>
+
+    </Style>
+
+
+    <Style x:Key="SidebarVersionTextStyle"
+           TargetType="TextBlock">
+
+        <Setter Property="Margin"
+                Value="0,3,0,0"/>
+
+        <Setter Property="FontSize"
+                Value="10"/>
+
+        <Setter Property="Foreground"
+                Value="{StaticResource SidebarVersionTextBrush}"/>
+
+    </Style>
+
+</ResourceDictionary>

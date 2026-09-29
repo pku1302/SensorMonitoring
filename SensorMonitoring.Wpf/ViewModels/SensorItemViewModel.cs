@@ -19,6 +19,9 @@ public partial class SensorItemViewModel : ObservableObject
     private double humidity;
 
     [ObservableProperty]
+    private long totalProduction;
+
+    [ObservableProperty]
     private DateTime timestamp;
 
     [ObservableProperty]
@@ -40,10 +43,12 @@ public partial class SensorItemViewModel : ObservableObject
     public void Update(
         double temperature,
         double humidity,
+        long totalProduction,
         DateTime timestamp)
     {
         Temperature = temperature;
         Humidity = humidity;
+        TotalProduction = totalProduction;
         Timestamp = timestamp;
 
         OnPropertyChanged(nameof(LocalTimestamp));

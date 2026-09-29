@@ -17,6 +17,8 @@ builder.Services.AddHostedService<TcpSensorServer>();
 
 builder.Services.AddSingleton<SensorPacketChannel>();
 
+builder.Services.AddSingleton<ProductionCounterService>();
+
 builder.Services.AddHostedService<SensorDataProcessor>();
 
 builder.Services.AddSignalR();

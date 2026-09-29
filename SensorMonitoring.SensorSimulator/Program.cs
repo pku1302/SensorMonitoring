@@ -60,6 +60,8 @@ static async Task RunSensorAsync(
                             40 + Random.Shared.NextDouble() * 30,
                             2),
 
+                    ProducedQuantity = Random.Shared.Next(0, 6),
+
                     Timestamp = DateTime.UtcNow
                 };
 
@@ -77,8 +79,9 @@ static async Task RunSensorAsync(
 
                 Console.WriteLine(
                     $"[{deviceId}] " +
-                    $"{packet.Temperature:F2} °C, " +
-                    $"{packet.Humidity:F2} %");
+                    $"Temp={packet.Temperature:F2} °C, " +
+                    $"Humidity={packet.Humidity:F2} %" +
+                    $"Produced={packet.ProducedQuantity}");
 
                 await Task.Delay(1000);
             }

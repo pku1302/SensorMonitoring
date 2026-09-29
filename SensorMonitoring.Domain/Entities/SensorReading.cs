@@ -13,6 +13,8 @@ public class SensorReading
     public double Temperature { get; set; }
 
     public double Humidity { get; set; }
+    
+    public long TotalProduction { get; set; }
 
     public DateTime RecordedAt { get; set; }
 
