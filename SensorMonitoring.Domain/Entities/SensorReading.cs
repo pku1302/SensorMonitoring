@@ -8,7 +8,9 @@ public class SensorReading
 {
     public long Id { get; set; }
 
-    public string DeviceId { get; set; } = string.Empty;
+    public int SensorId { get; set; }
+
+    public Sensor Sensor { get; set; } = null!;
 
     public double Temperature { get; set; }
 

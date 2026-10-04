@@ -4,47 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SensorMonitoring.Wpf"
-        xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
         xmlns:views="clr-namespace:SensorMonitoring.Wpf.Views"
+        xmlns:controls="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
         xmlns:vm="clr-namespace:SensorMonitoring.Wpf.ViewModels"
         mc:Ignorable="d"
-        Title="Sensor Monitoring"
-        Height="800"
-        Width="1400">
+         Title="Sensor Monitor" Width="1180" Height="900" MinWidth="960" MinHeight="650"
+         FontFamily="Segoe UI, Malgun Gothic" Background="{StaticResource PageBrush}"
+         WindowStartupLocation="CenterScreen" UseLayoutRounding="True">
     <Window.Resources>
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView/>
         </DataTemplate>
     </Window.Resources>
-    
-    <Grid Margin="20">
-
-        <!-- 전체 화면: 제목 / 연결상태 / 본문 -->
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="160"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
-        <views:StatusBarView 
-            Grid.Row="0"
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            DataContext="{Binding StatusBarViewModel}"/>
-
-        <views:SidebarView 
-            Grid.Row="1"
-            Grid.Column="0"
-            DataContext="{Binding SidebarViewModel}"/>
-
-        <ContentControl 
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="20, 0"
-            Content="{Binding CurrentViewModel}"/>
+        <Border Grid.ColumnSpan="2" Padding="22,16" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="SENSOR MONITOR" FontWeight="SemiBold"/>
+                <TextBlock Text="WPF · 샘플 데이터" Margin="16,2,0,0" Style="{StaticResource MutedText}"/>
+            </StackPanel>
+        </Border>
+        <controls:Sidebar Grid.Row="1"/>
+        <views:DashboardView Grid.Row="1" Grid.Column="1" DataContext="{Binding DashboardViewModel}"/>
+        <controls:ConnectionStatusBar Grid.Row="2" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>

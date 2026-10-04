@@ -21,6 +21,9 @@
                 <ResourceDictionary
                     Source="Styles/CommonStyles.xaml"/>
 
+                <ResourceDictionary 
+                    Source="/Styles/Themes.xaml"/>
+
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

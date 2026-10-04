@@ -5,6 +5,7 @@
     <Project Path="SensorMonitoring.Domain/SensorMonitoring.Domain.csproj" />
     <Project Path="SensorMonitoring.Infrastructure/SensorMonitoring.Infrastructure.csproj" />
     <Project Path="SensorMonitoring.SensorSimulator/SensorMonitoring.SensorSimulator.csproj" />
+    <Project Path="SensorMonitoring.Tests/SensorMonitoring.Tests.csproj" Id="417158b1-2cff-485b-92e1-af15ca31bb08" />
     <Project Path="SensorMonitoring.Wpf/SensorMonitoring.Wpf.csproj" />
   </Folder>
 </Solution>

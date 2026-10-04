@@ -1,12 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
-using Microsoft.AspNetCore.SignalR.Client;
-using SensorMonitoring.Contracts;
-using SensorMonitoring.Wpf.Services;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace SensorMonitoring.Wpf.ViewModels;
 

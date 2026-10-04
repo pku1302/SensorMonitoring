@@ -5,21 +5,21 @@ namespace SensorMonitoring.Api.Services;
 
 public class ProductionCounterService
 {
-    private readonly Dictionary<string, long>
+    private readonly Dictionary<int, long>
         _totals = new();
 
     public async Task<long> AddProductionAsync(
-        string deviceId,
+        int sensorId,
         long producedQuantity,
         MonitoringDbContext dbContext,
         CancellationToken cancellationToken)
     {
         if (!_totals.TryGetValue(
-                deviceId,
+                sensorId,
                 out var total))
         {
             total = await dbContext.SensorReadings
-                .Where(x => x.DeviceId == deviceId)
+                .Where(x => x.SensorId == sensorId)
                 .OrderByDescending(x => x.RecordedAt)
                 .Select(x => x.TotalProduction)
                 .FirstOrDefaultAsync(cancellationToken);
@@ -27,7 +27,7 @@ public class ProductionCounterService
 
         total += producedQuantity;
 
-        _totals[deviceId] = total;
+        _totals[sensorId] = total;
 
         return total;
     }

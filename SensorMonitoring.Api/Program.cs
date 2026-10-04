@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SensorMonitoring.Api.Hubs;
 using SensorMonitoring.Api.Services;
+using SensorMonitoring.Api.Services.Get;
 using SensorMonitoring.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // ====== TCP/ Data Transfer =============
 
@@ -21,12 +24,20 @@ builder.Services.AddSingleton<ProductionCounterService>();
 
 builder.Services.AddHostedService<SensorDataProcessor>();
 
+builder.Services.AddSingleton<SensorStatusService>();
+
+builder.Services.AddSingleton<SensorIdCache>();
+
+builder.Services.AddSingleton<SensorCacheService>();
+
 builder.Services.AddSignalR();
 
 // ====== DB ============
 var connectionString =
     builder.Configuration
         .GetConnectionString("MonitoringDb");
+
+builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
 
 builder.Services.AddDbContext<MonitoringDbContext>(
     options =>
@@ -40,6 +51,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();

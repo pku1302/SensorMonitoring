@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="SensorMonitoring.Wpf.Views.Controls.Sidebar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
+             mc:Ignorable="d">
+    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0" Padding="12,24">
+        <StackPanel>
+            <Border Background="#EAF1FF" CornerRadius="5" Padding="12" Margin="0,0,0,6">
+                <TextBlock Text="대시보드" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold"/>
+            </Border>
+            <TextBlock Text="데이터 이력" Margin="12,12" Style="{StaticResource MutedText}"/>
+            <TextBlock Text="알람 이력" Margin="12,12" Style="{StaticResource MutedText}"/>
+            <TextBlock Text="센서 설정" Margin="12,12" Style="{StaticResource MutedText}"/>
+            <TextBlock Text="다른 메뉴는 화면 구성 예시입니다." TextWrapping="Wrap" Margin="12,24,12,0" Style="{StaticResource MutedText}"/>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SensorMonitoring.Wpf.Views
+namespace SensorMonitoring.Wpf.Views.Controls
 {
     /// <summary>
-    /// SidebarView.xaml에 대한 상호 작용 논리
+    /// Sidebar.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class SidebarView : UserControl
+    public partial class Sidebar : UserControl
     {
-        public SidebarView()
+        public Sidebar()
         {
             InitializeComponent();
         }

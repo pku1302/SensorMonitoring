@@ -57,10 +57,6 @@ namespace SensorMonitoring.Wpf
                     services.AddSingleton<MainWindow>();
 
                     services.AddTransient<DashboardView>();
-
-                    services.AddTransient<SidebarView>();
-
-                    services.AddTransient<StatusBarView>();
                 })
                 .Build();
         }

@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="SensorMonitoring.Wpf.Views.Controls.ActiveAlarmList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
+             mc:Ignorable="d" >
+    <Border Style="{StaticResource Panel}">
+        <StackPanel>
+            <DockPanel Margin="0,0,0,10">
+                <TextBlock Text="현재 이상 상태" Style="{StaticResource SectionTitle}"/>
+                <TextBlock Text="{Binding ActiveAlarms.Count, StringFormat={}{0}건}" HorizontalAlignment="Right" Style="{StaticResource MutedText}"/>
+            </DockPanel>
+            <ItemsControl ItemsSource="{Binding ActiveAlarms}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="0,12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="75"/>
+                                    <ColumnDefinition Width="65"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding StatusText}" Style="{StaticResource StatusText}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding SensorId}" FontSize="12"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Border>
+</UserControl>

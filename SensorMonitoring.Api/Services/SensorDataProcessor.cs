@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SensorMonitoring.Api.Hubs;
+using SensorMonitoring.Api.Models;
 using SensorMonitoring.Contracts;
 using SensorMonitoring.Domain.Entities;
 using SensorMonitoring.Infrastructure.Data;
@@ -14,19 +15,25 @@ public class SensorDataProcessor : BackgroundService
     private readonly IHubContext<SensorHub> _hubContext;
     private readonly ILogger<SensorDataProcessor> _logger;
     private readonly ProductionCounterService _productionCounter;
+    private readonly SensorStatusService _sensorStatusService;
+    private readonly SensorCacheService _sensorCacheService;
 
     public SensorDataProcessor(
         SensorPacketChannel channel,
         IServiceScopeFactory scopeFactory,
         ILogger<SensorDataProcessor> logger,
         IHubContext<SensorHub> hubContext,
-        ProductionCounterService productionCounter)
+        ProductionCounterService productionCounter,
+        SensorCacheService sensorCacheService,
+        SensorStatusService sensorStatusService)
     {
         _channel = channel;
         _scopeFactory = scopeFactory;
         _logger = logger;
         _hubContext = hubContext;
         _productionCounter = productionCounter;
+        _sensorCacheService = sensorCacheService;
+        _sensorStatusService = sensorStatusService;
     }
 
     protected override async Task ExecuteAsync(
@@ -52,7 +59,7 @@ public class SensorDataProcessor : BackgroundService
         }
     }
     private async Task SaveReadingAsync(
-        Contracts.SensorPacket packet,
+        SensorPacket packet,
         CancellationToken cancellationToken)
     {
         using var scope =
@@ -63,18 +70,31 @@ public class SensorDataProcessor : BackgroundService
                 .GetRequiredService<
                     MonitoringDbContext>();
 
+        var sensorInfo =
+            await _sensorCacheService.GetAsync(
+                packet.DeviceId,
+                dbContext,
+                cancellationToken);
+
+        if (sensorInfo is null)
+            return;
+
         var totalProduction =
            await _productionCounter.AddProductionAsync(
-               packet.DeviceId,
+               sensorInfo.SensorId,
                packet.ProducedQuantity,
                dbContext,
                cancellationToken);
 
+        var status = _sensorStatusService.Evaluate(
+            packet.Temperature,
+            packet.Humidity,
+            sensorInfo.SensorAlarmSetting);
+
         var entity =
             new SensorReading
             {
-                DeviceId =
-                    packet.DeviceId,
+                SensorId = sensorInfo.SensorId,
 
                 Temperature =
                     packet.Temperature,
@@ -82,7 +102,7 @@ public class SensorDataProcessor : BackgroundService
                 Humidity =
                     packet.Humidity,
 
-                TotalProduction = 
+                TotalProduction =
                     totalProduction,
 
                 RecordedAt =
@@ -94,9 +114,10 @@ public class SensorDataProcessor : BackgroundService
         var realtimeDto = new SensorRealTimeDto
         {
             DeviceId = packet.DeviceId,
-            Temeprature = packet.Temperature,
+            Temeperature = packet.Temperature,
             Humidity = packet.Humidity,
             TotalProduction = totalProduction,
+            Status = status,
             Timestamp = packet.Timestamp
         };
 
@@ -110,7 +131,7 @@ public class SensorDataProcessor : BackgroundService
 
         _logger.LogInformation(
             "Saved: {DeviceId}, Id: {Id}",
-            entity.DeviceId,
+            entity.SensorId,
             entity.Id);
     }
 }

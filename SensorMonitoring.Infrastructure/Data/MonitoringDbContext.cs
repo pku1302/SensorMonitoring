@@ -19,6 +19,12 @@ public class MonitoringDbContext : DbContext
     public DbSet<Sensor> Sensors =>
         Set<Sensor>();
 
+    public DbSet<SensorAlarmHistory> SensorAlarmHistories => 
+        Set<SensorAlarmHistory>();
+
+    public DbSet<SensorAlarmSetting> SensorAlarmSettings => 
+        Set<SensorAlarmSetting>();
+
     protected override void OnModelCreating(
         ModelBuilder modelBuilder)
     {
@@ -31,7 +37,7 @@ public class MonitoringDbContext : DbContext
 
                 entity.HasKey(x => x.Id);
 
-                entity.Property(x => x.DeviceId)
+                entity.Property(x => x.SensorId)
                     .HasMaxLength(50)
                     .IsRequired();
 
@@ -44,9 +50,14 @@ public class MonitoringDbContext : DbContext
                 entity.Property(x => x.RecordedAt)
                     .IsRequired();
 
+                entity.HasOne(x => x.Sensor)
+                    .WithMany(x => x.Readings)
+                    .HasForeignKey(x => x.SensorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasIndex(x => new
                 {
-                    x.DeviceId,
+                    x.SensorId,
                     x.RecordedAt
                 });
             });
@@ -69,6 +80,34 @@ public class MonitoringDbContext : DbContext
 
             entity.Property(x => x.UpdatedAt)
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<SensorAlarmSetting>(entity =>
+        {
+            entity.ToTable("SensorAlarmSettings");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasOne(x => x.Sensor)
+                .WithOne(x => x.AlarmSetting)
+                .HasForeignKey<SensorAlarmSetting>(
+                    x => x.SensorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.SensorId)
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<SensorAlarmHistory>(entity =>
+        {
+            entity.ToTable("SensorAlarmHistories");
+
+            entity.HasKey(x => x.Id);
+
+            entity.HasOne(x => x.Sensor)
+                .WithMany(x => x.AlarmHistories)
+                .HasForeignKey(x => x.SensorId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 

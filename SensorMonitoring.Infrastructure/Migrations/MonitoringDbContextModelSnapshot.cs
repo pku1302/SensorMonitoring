@@ -56,6 +56,78 @@ namespace SensorMonitoring.Infrastructure.Migrations
                     b.ToTable("Sensors", (string)null);
                 });
 
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorAlarmHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AlarmCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AlarmMessage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CleareaAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SensorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId");
+
+                    b.ToTable("SensorAlarmHistories", (string)null);
+                });
+
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorAlarmSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double?>("HumidityDanger")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("HumidityWarning")
+                        .HasColumnType("float");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("OfflineTimeoutSeconds")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SensorId")
+                        .HasColumnType("int");
+
+                    b.Property<double?>("TemperatureDanger")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("TemperatureWarning")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId")
+                        .IsUnique();
+
+                    b.ToTable("SensorAlarmSettings", (string)null);
+                });
+
             modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorReading", b =>
                 {
                     b.Property<long>("Id")
@@ -64,16 +136,15 @@ namespace SensorMonitoring.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("DeviceId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<double>("Humidity")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("RecordedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("SensorId")
+                        .HasMaxLength(50)
+                        .HasColumnType("int");
 
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
@@ -83,9 +154,51 @@ namespace SensorMonitoring.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DeviceId", "RecordedAt");
+                    b.HasIndex("SensorId", "RecordedAt");
 
                     b.ToTable("SensorReadings", (string)null);
+                });
+
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorAlarmHistory", b =>
+                {
+                    b.HasOne("SensorMonitoring.Domain.Entities.Sensor", "Sensor")
+                        .WithMany("AlarmHistories")
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorAlarmSetting", b =>
+                {
+                    b.HasOne("SensorMonitoring.Domain.Entities.Sensor", "Sensor")
+                        .WithOne("AlarmSetting")
+                        .HasForeignKey("SensorMonitoring.Domain.Entities.SensorAlarmSetting", "SensorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.SensorReading", b =>
+                {
+                    b.HasOne("SensorMonitoring.Domain.Entities.Sensor", "Sensor")
+                        .WithMany("Readings")
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("SensorMonitoring.Domain.Entities.Sensor", b =>
+                {
+                    b.Navigation("AlarmHistories");
+
+                    b.Navigation("AlarmSetting");
+
+                    b.Navigation("Readings");
                 });
 #pragma warning restore 612, 618
         }

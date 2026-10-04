@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
 using SensorMonitoring.Contracts;
 using SensorMonitoring.Wpf.Services;
+using SensorMonitoring.Wpf.ViewModels.Controls;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Threading;
@@ -12,129 +11,83 @@ namespace SensorMonitoring.Wpf.ViewModels;
 public partial class DashboardViewModel : ObservableObject
 {
     private readonly ISensorRealtimeService _realtimeService;
-    private const int MaxChartPoints = 300;
-    private readonly ObservableCollection<double>
-        _temperatureValues = new();
-    private readonly ObservableCollection<double>
-        _humidityValues = new();
-    public ISeries[] TemperatureSeries { get; }
-    public ISeries[] HumiditySeries { get; }
-    public ObservableCollection<SensorItemViewModel> Sensors { get; }
+
+    public ObservableCollection<SensorCardViewModel> Sensors { get; }
         = new();
 
-    [ObservableProperty]
-    private SensorItemViewModel? selectedSensor;
+    public ObservableCollection<SummaryCardViewModel> StatusSummaries { get; }
+
+    private readonly SummaryCardViewModel _normalSummary;
+    private readonly SummaryCardViewModel _warningSummary;
+    private readonly SummaryCardViewModel _dangerSummary;
+    private readonly SummaryCardViewModel _offlineSummary;
+
     public DashboardViewModel(
         ISensorRealtimeService realtimeService)
     {
         _realtimeService = realtimeService;
 
-        _realtimeService.SensorUpdated +=
-            OnSensorUpdated;
+        _realtimeService.SensorUpdated += OnSensorUpdated;
 
-        TemperatureSeries =
-        [
-            new LineSeries<double>
-            {
-                Name = "Temperature",
-                Values = _temperatureValues,
-                GeometrySize = 6,
-                LineSmoothness = 0
-            }
-        ];
+        _normalSummary =
+            new SummaryCardViewModel(
+                "정상",
+                SensorStatus.Normal);
 
-        HumiditySeries =
-        [
-            new LineSeries<double>
-            {
-                Name = "Humidity",
-                Values = _humidityValues,
-                GeometrySize= 6,
-                LineSmoothness= 0
-            }
-        ];
+        _warningSummary =
+            new SummaryCardViewModel(
+                "주의",
+                SensorStatus.Warning);
+
+        _dangerSummary =
+            new SummaryCardViewModel(
+                "위험",
+                SensorStatus.Danger);
+
+        _offlineSummary =
+            new SummaryCardViewModel(
+                "수신 끊김",
+                SensorStatus.Offline);
+
+        StatusSummaries = new ObservableCollection<SummaryCardViewModel>
+        {
+            _normalSummary,
+            _warningSummary,
+            _dangerSummary,
+            _offlineSummary
+        };
     }
-    private void OnSensorUpdated(
-        SensorRealTimeDto dto)
+    private void OnSensorUpdated(SensorRealTimeDto dto)
     {
         Application.Current.Dispatcher.Invoke(() =>
         {
-            UpdateSensor(dto);
-        });
-    }
-
-    partial void OnSelectedSensorChanged(
-        SensorItemViewModel? value)
-    {
-        _temperatureValues.Clear();
-        _humidityValues.Clear();
-    }
-
-
-    private void UpdateSensor(
-        SensorRealTimeDto dto)
-    {
-        var sensor =
-            Sensors.FirstOrDefault(
+            var sensor = Sensors.FirstOrDefault(
                 x => x.DeviceId == dto.DeviceId);
 
-        if (sensor is null)
-        {
-            sensor =
-                new SensorItemViewModel(
-                    dto.DeviceId);
-
-            Sensors.Add(sensor);
-        }
-
-        sensor.Update(
-            dto.Temeprature,
-            dto.Humidity,
-            dto.TotalProduction,
-            dto.Timestamp);
-
-        if (SelectedSensor?.DeviceId == dto.DeviceId)
-        {
-            AddChartPoint(dto);
-        }
-    }
-
-    private void AddChartPoint(
-        SensorRealTimeDto packet)
-    {
-        _temperatureValues.Add(
-            packet.Temeprature);
-
-        _humidityValues.Add(
-            packet.Humidity);
-
-        if (_temperatureValues.Count >
-            MaxChartPoints)
-        {
-            _temperatureValues.RemoveAt(0);
-        }
-
-        if (_humidityValues.Count >
-            MaxChartPoints)
-        {
-            _humidityValues.RemoveAt(0);
-        }
-    }
-
-    private void CheckSensorStatus()
-    {
-        var now = DateTime.UtcNow;
-
-        foreach (var sensor in Sensors)
-        {
-            var elapsed =
-                now - sensor.Timestamp.ToUniversalTime();
-
-            if (elapsed > TimeSpan.FromSeconds(5))
+            if (sensor is null)
             {
-                sensor.MarkOffline();
-            }
-        }
-    }
+                sensor = new SensorCardViewModel(dto.DeviceId);
 
+                Sensors.Add(sensor);
+            }
+
+            sensor.Update(dto);
+
+            UpdateSensorCount();
+        });
+    }
+    private void UpdateSensorCount()
+    {
+        _normalSummary.Count = 
+            Sensors.Count(x => x.Status == SensorStatus.Normal);
+
+        _warningSummary.Count = 
+            Sensors.Count(x => x.Status == SensorStatus.Warning);
+
+        _dangerSummary.Count =
+            Sensors.Count(x => x.Status == SensorStatus.Danger);
+
+        _offlineSummary.Count =
+            Sensors.Count(x => x.Status == SensorStatus.Offline);
+    }
 }
