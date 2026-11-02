@@ -5,30 +5,211 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
              mc:Ignorable="d" >
-    <Border Style="{StaticResource Panel}">
-        <StackPanel>
-            <DockPanel Margin="0,0,0,10">
-                <TextBlock Text="현재 이상 상태" Style="{StaticResource SectionTitle}"/>
-                <TextBlock Text="{Binding ActiveAlarms.Count, StringFormat={}{0}건}" HorizontalAlignment="Right" Style="{StaticResource MutedText}"/>
-            </DockPanel>
-            <ItemsControl ItemsSource="{Binding ActiveAlarms}">
+
+    <UserControl.Resources>
+        <!-- 일반 텍스트 -->
+        <Style x:Key="StatusTextStyle"
+               TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 상태별 색상 -->
+        <Style x:Key="AlarmStatusStyle"
+               TargetType="TextBlock">
+
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+
+            <Style.Triggers>
+                <!-- 위험 -->
+                <DataTrigger Binding="{Binding Status}"
+                             Value="Danger">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource DangerBrush}"/>
+                </DataTrigger>
+
+                <!-- 주의 -->
+                <DataTrigger Binding="{Binding Status}"
+                             Value="Warning">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource WarningBrush}"/>
+                </DataTrigger>
+
+                <!-- 끊김 -->
+                <DataTrigger Binding="{Binding Status}"
+                             Value="Disconnected">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource MutedBrush}"/>
+                </DataTrigger>
+
+                <!-- 정상 -->
+                <DataTrigger Binding="{Binding Status}"
+                             Value="Normal">
+                    <Setter Property="Foreground"
+                            Value="{StaticResource NormalBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 페이징 버튼 -->
+        <Style x:Key="PageButtonStyle"
+               TargetType="Button">
+
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4">
+
+                            <ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Margin="{TemplateBinding Padding}"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <!-- 마우스 오버 -->
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#EAF1F9"/>
+                            </Trigger>
+
+                            <!-- 클릭 -->
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#DBEAFE"/>
+                            </Trigger>
+
+                            <!-- 비활성화 -->
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Background"
+                                        Value="#F1F5F9"/>
+                                <Setter Property="Foreground"
+                                        Value="#94A3B8"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Style="{StaticResource Panel}"
+                BorderThickness="1"
+                CornerRadius="5"
+                VerticalAlignment="Top">
+
+        <DockPanel LastChildFill="True">
+
+            <!-- 제목 -->
+            <Grid DockPanel.Dock="Top" Height="35">
+                <TextBlock Text="현재 이상 상태"
+                               Foreground="{StaticResource MutedBrush}"
+                               FontSize="14"
+                               FontWeight="Bold"/>
+
+                <TextBlock Text="{Binding AlarmCountText}"
+                               Foreground="{StaticResource MutedBrush}"
+                               HorizontalAlignment="Right"/>
+            </Grid>
+
+            <!-- 페이징 버튼 -->
+            <StackPanel DockPanel.Dock="Bottom"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,15,0,0">
+
+                <Button Content="◀ 이전"
+                            Command="{Binding PreviousPageCommand}"
+                            Style="{StaticResource PageButtonStyle}"/>
+
+                <TextBlock Text="{Binding PageInfo}"
+                               Foreground="{StaticResource MutedBrush}"
+                               VerticalAlignment="Center"
+                               Margin="20,0"/>
+
+                <Button Content="다음 ▶"
+                            Command="{Binding NextPageCommand}"
+                            Style="{StaticResource PageButtonStyle}"/>
+
+            </StackPanel>
+
+            <!-- 현재 페이지 데이터 -->
+            <ItemsControl ItemsSource="{Binding PagedAlarms}"
+                          Padding="16,0,16,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="0,12">
-                            <Grid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1"/>
+                                <RowDefinition Height="48"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 구분선 -->
+                            <Border Grid.Row="0"
+                                    Background="#E2E8F0"/>
+
+                            <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="75"/>
-                                    <ColumnDefinition Width="65"/>
+                                    <ColumnDefinition Width="74"/>
+                                    <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding StatusText}" Style="{StaticResource StatusText}"/>
-                                <TextBlock Grid.Column="1" Text="{Binding SensorId}" FontSize="12"/>
-                                <TextBlock Grid.Column="2" Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"/>
+
+                                <!-- 상태 -->
+                                <StackPanel Grid.Column="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                    <TextBlock Text="{Binding StatusIcon}"
+                                                   Margin="0,0,5,0"
+                                                   Style="{StaticResource AlarmStatusStyle}"/>
+
+                                    <TextBlock Text="{Binding StatusText}"
+                                                   Style="{StaticResource AlarmStatusStyle}"/>
+
+                                </StackPanel>
+
+                                <!-- 센서 -->
+                                <TextBlock Grid.Column="1"
+                                               Text="{Binding DeviceId}"
+                                               Style="{StaticResource StatusTextStyle}"/>
+
+                                <!-- 메시지 -->
+                                <TextBlock Grid.Column="2"
+                                               Text="{Binding Message}"
+                                               Style="{StaticResource StatusTextStyle}"
+                                               TextTrimming="CharacterEllipsis"/>
                             </Grid>
-                        </Border>
+                        </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </StackPanel>
+
+        </DockPanel>
     </Border>
 </UserControl>

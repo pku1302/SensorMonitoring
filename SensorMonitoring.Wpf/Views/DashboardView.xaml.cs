@@ -12,16 +12,23 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace SensorMonitoring.Wpf.Views
+namespace SensorMonitoring.Wpf.Views;
+
+/// <summary>
+/// DashboardView.xaml에 대한 상호 작용 논리
+/// </summary>
+public partial class DashboardView : UserControl
 {
-    /// <summary>
-    /// DashboardView.xaml에 대한 상호 작용 논리
-    /// </summary>
-    public partial class DashboardView : UserControl
+    public DashboardView()
     {
-        public DashboardView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
+
+    private async void DashboardView_Loaded(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (DataContext is DashboardViewModel vm)
+            await vm.InitializeChartsAsync();
     }
 }

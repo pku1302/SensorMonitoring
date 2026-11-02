@@ -1,5 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SensorMonitoring.Contracts;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Media;
 
 namespace SensorMonitoring.Wpf.ViewModels.Controls;
 
@@ -14,7 +17,7 @@ public partial class SensorCardViewModel : ObservableObject
     private double humidity;
 
     [ObservableProperty]
-    private SensorStatus status;
+    private SensorStatusDto status;
 
     public SensorCardViewModel(string deviceId)
     {
@@ -23,7 +26,7 @@ public partial class SensorCardViewModel : ObservableObject
 
     public void Update(SensorRealTimeDto dto)
     {
-        Temperature = dto.Temeperature;
+        Temperature = dto.Temperature;
         Humidity = dto.Humidity;
         Status = dto.Status;
     }

@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "SensorSimulator-Development": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "SensorSimulator-Staging": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Staging"
+      }
+    }
+  }
+}

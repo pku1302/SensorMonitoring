@@ -26,7 +26,7 @@
                     <ControlTemplate.Triggers>
 
                         <Trigger Property="Status"
-                                 Value="{x:Static models:SensorStatus.Normal}">
+                                 Value="{x:Static models:SensorStatusDto.Normal}">
                             <Setter TargetName="Dot"
                                     Property="Fill"
                                     Value="{StaticResource NormalBrush}"/>
@@ -41,7 +41,7 @@
                         </Trigger>
 
                         <Trigger Property="Status"
-                                 Value="{x:Static models:SensorStatus.Warning}">
+                                 Value="{x:Static models:SensorStatusDto.Warning}">
                             <Setter TargetName="Dot"
                                     Property="Fill"
                                     Value="{StaticResource WarningBrush}"/>
@@ -56,7 +56,7 @@
                         </Trigger>
 
                         <Trigger Property="Status"
-                                 Value="{x:Static models:SensorStatus.Danger}">
+                                 Value="{x:Static models:SensorStatusDto.Danger}">
                             <Setter TargetName="Dot"
                                     Property="Fill"
                                     Value="{StaticResource DangerBrush}"/>
@@ -71,7 +71,7 @@
                         </Trigger>
 
                         <Trigger Property="Status"
-                                 Value="{x:Static models:SensorStatus.Offline}">
+                                 Value="{x:Static models:SensorStatusDto.Offline}">
                             <Setter TargetName="Dot"
                                     Property="Fill"
                                     Value="{StaticResource MutedBrush}"/>

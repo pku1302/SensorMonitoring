@@ -7,12 +7,43 @@ using System.Text;
 namespace SensorMonitoring.Wpf.ViewModels;
 public partial class SidebarViewModel : ObservableObject
 {
+    [ObservableProperty]
+    private string selectedMenu = "Dashboard";
+
     public event Action<string>? NavigationRequested;
 
     [RelayCommand]
-    private void Navigate(string destination)
+    private void Navigate(string menu)
     {
-        NavigationRequested?.Invoke(destination);
+        if (SelectedMenu == menu)
+            return;
+
+        SelectedMenu = menu;
+        NavigationRequested?.Invoke(menu);
     }
 
+    [RelayCommand]
+    private void NavigateDashboard()
+    {
+        Navigate("Dashboard");
+    }
+
+    [RelayCommand]
+    private void NavigateDataHistory()
+    {
+        Navigate("DataHistory");
+    }
+
+
+    [RelayCommand]
+    private void NavigateAlarmHistory()
+    {
+        Navigate("AlarmHistory");
+    }
+
+    [RelayCommand]
+    private void NavigateSensorSettings()
+    {
+        Navigate("SensorSettings");
+    }
 }

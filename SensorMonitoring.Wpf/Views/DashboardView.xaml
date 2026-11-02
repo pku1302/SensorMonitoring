@@ -5,14 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views"
              xmlns:controls="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
+             xmlns:chart="clr-namespace:SensorMonitoring.Wpf.Views.Chart"
+             Loaded="DashboardView_Loaded"
              mc:Ignorable="d" >
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24">
             <controls:DashboardHeader/>
             <controls:StatusSummary/>
             <controls:SensorGrid/>
-            <controls:TrendChart/>
-            <controls:ActiveAlarmList/>
+            
+            <!-- 각 차트에 전용 ViewModel 전달 -->
+            <chart:SensorChart
+                DataContext="{Binding TemperatureChart}"/>
+
+            <chart:SensorChart
+                DataContext="{Binding HumidityChart}"/>
+
+            <controls:ActiveAlarmList
+                DataContext="{Binding ActiveAlarms}"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

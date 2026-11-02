@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SensorMonitoring.Api.Services;
-using SensorMonitoring.Api.Services.Get;
+using SensorMonitoring.Application.Abstractions;
 using SensorMonitoring.Contracts;
 
 namespace SensorMonitoring.Api.Controllers;

@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using SensorMonitoring.Api.Hubs;
 using SensorMonitoring.Api.Services;
-using SensorMonitoring.Api.Services.Get;
+using SensorMonitoring.Application.Abstractions;
+using SensorMonitoring.Application.Services;
+using SensorMonitoring.Infrastructure.Caching;
 using SensorMonitoring.Infrastructure.Data;
+using SensorMonitoring.Infrastructure.Querues;
+using SensorMonitoring.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,15 +24,37 @@ builder.Services.AddHostedService<TcpSensorServer>();
 
 builder.Services.AddSingleton<SensorPacketChannel>();
 
-builder.Services.AddSingleton<ProductionCounterService>();
-
 builder.Services.AddHostedService<SensorDataProcessor>();
 
-builder.Services.AddSingleton<SensorStatusService>();
+builder.Services.AddSingleton<SensorChartCache>();
+
+builder.Services.AddSingleton<ISensorChartCache>(
+    sp => sp.GetRequiredService<SensorChartCache>());
+
+builder.Services.AddSingleton<SensorAlarmService>();
+
+builder.Services.AddSingleton<ISensorAlarmService>(
+    sp => sp.GetRequiredService<SensorAlarmService>());
+
+builder.Services.AddSingleton<ISensorRealtimeNotifier, SensorRealtimeService>();
 
 builder.Services.AddSingleton<SensorIdCache>();
 
-builder.Services.AddSingleton<SensorCacheService>();
+builder.Services.AddScoped<SensorTrendService>();
+
+builder.Services.AddScoped<ISensorHistoryReader, SensorHistoryReader>();
+
+builder.Services.AddScoped<SensorHistoryService>();
+
+builder.Services.AddScoped<ISensorCacheService, SensorCacheService>();
+
+builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
+
+builder.Services.AddScoped<ISensorReadingReader, SensorReadingReader>();
+
+builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
+
+builder.Services.AddScoped<SensorDataProcessingService>();
 
 builder.Services.AddSignalR();
 
@@ -37,13 +63,14 @@ var connectionString =
     builder.Configuration
         .GetConnectionString("MonitoringDb");
 
+builder.Services.AddDbContextFactory<MonitoringDbContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+});
+
 builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
 
-builder.Services.AddDbContext<MonitoringDbContext>(
-    options =>
-    {
-        options.UseSqlServer(connectionString);
-    });
+builder.Services.AddScoped<ISensorTrendDataReader, SensorTrendDataReader>();
 
 var app = builder.Build();
 

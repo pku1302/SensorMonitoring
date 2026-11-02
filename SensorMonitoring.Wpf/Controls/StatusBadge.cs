@@ -12,13 +12,13 @@ public class StatusBadge : Control
     public static readonly DependencyProperty StatusProperty =
         DependencyProperty.Register(
             nameof(Status),
-            typeof(SensorStatus),
+            typeof(SensorStatusDto),
             typeof(StatusBadge),
-            new PropertyMetadata(SensorStatus.Normal));
+            new PropertyMetadata(SensorStatusDto.Normal));
 
-    public SensorStatus Status
+    public SensorStatusDto Status
     {
-        get => (SensorStatus)GetValue(StatusProperty);
+        get => (SensorStatusDto)GetValue(StatusProperty);
         set => SetValue(StatusProperty, value);
     }
     static StatusBadge()

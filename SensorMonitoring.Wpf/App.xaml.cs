@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using SensorMonitoring.Wpf.Services;
 using SensorMonitoring.Wpf.Settings;
 using SensorMonitoring.Wpf.ViewModels;
@@ -24,6 +25,11 @@ namespace SensorMonitoring.Wpf
                         "appsettings.json",
                         optional: false,
                         reloadOnChange: true);
+
+                    config.AddJsonFile(
+                        $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
+                        optional: true,
+                        reloadOnChange: true);
                 })
                 .ConfigureServices((context, services) =>
                 {
@@ -38,6 +44,30 @@ namespace SensorMonitoring.Wpf
                         ISensorRealtimeService,
                         SensorRealtimeService>();
 
+                    services.AddHttpClient<
+                        ISensorChartApiService,
+                        SensorChartApiService>((provider, client) =>
+                   {
+                       var options = provider
+                        .GetRequiredService<IOptions<ServerOptions>>()
+                        .Value;
+
+                       client.BaseAddress =
+                        new Uri(options.BaseUrl.TrimEnd('/') + "/");
+                   });
+
+                    services.AddHttpClient<
+                        ISensorHistoryApiService,
+                        SensorHistoryApiService>((provider, client) =>
+                   {
+                       var options = provider
+                           .GetRequiredService<
+                               IOptions<ServerOptions>>().Value;
+
+                       client.BaseAddress = new Uri(
+                           options.BaseUrl.TrimEnd('/') + "/");
+                   });
+
                     // =========================
                     // ViewModels
                     // =========================
@@ -50,6 +80,12 @@ namespace SensorMonitoring.Wpf
 
                     services.AddSingleton<StatusBarViewModel>();
 
+                    services.AddSingleton<DataHistoryViewModel>();
+
+                    services.AddSingleton<AlarmHistoryViewModel>();
+
+                    services.AddSingleton<SensorSettingsViewModel>();
+
                     // =========================
                     // Views
                     // =========================
@@ -57,6 +93,12 @@ namespace SensorMonitoring.Wpf
                     services.AddSingleton<MainWindow>();
 
                     services.AddTransient<DashboardView>();
+
+                    System.Diagnostics.Debug.WriteLine(
+                        $"환경: {context.HostingEnvironment.EnvironmentName}");
+
+                    System.Diagnostics.Debug.WriteLine(
+                        $"API 주소: {context.Configuration["Server:BaseUrl"]}");
                 })
                 .Build();
         }

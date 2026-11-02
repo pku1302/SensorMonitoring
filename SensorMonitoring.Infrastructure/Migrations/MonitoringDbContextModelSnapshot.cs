@@ -72,7 +72,7 @@ namespace SensorMonitoring.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("CleareaAt")
+                    b.Property<DateTime?>("ClearedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("OccurredAt")

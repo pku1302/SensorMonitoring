@@ -10,7 +10,7 @@ namespace SensorMonitoring.Tests.Helpers;
 public sealed class TestDbContext : IDisposable
 {
     public SqliteConnection Connection { get; }
-    public MonitoringDbContext Context { get; }
+    public DbContextOptions<MonitoringDbContext> Options { get; }
 
     public TestDbContext()
     {
@@ -19,20 +19,24 @@ public sealed class TestDbContext : IDisposable
 
         Connection.Open();
 
-        var options =
+        Options =
             new DbContextOptionsBuilder<MonitoringDbContext>()
                 .UseSqlite(Connection)
                 .Options;
 
-        Context =
-            new MonitoringDbContext(options);
+        using var context =
+            new MonitoringDbContext(Options);
 
-        Context.Database.EnsureCreated();
+        context.Database.EnsureCreated();
+    }
+
+    public MonitoringDbContext CreateContext()
+    {
+        return new MonitoringDbContext(Options);
     }
 
     public void Dispose()
     {
-        Context.Dispose();
         Connection.Dispose();
     }
 }

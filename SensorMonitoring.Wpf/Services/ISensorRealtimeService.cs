@@ -9,8 +9,8 @@ public interface ISensorRealtimeService
 {
     public string ConnectionStatus { get; }
     event Action<SensorRealTimeDto>? SensorUpdated;
-
     event Action<string>? ConnectionStatusChanged;
+    event Action<SensorAlarmChangedDto>? AlarmChanged;
 
     Task StartAsync();
 

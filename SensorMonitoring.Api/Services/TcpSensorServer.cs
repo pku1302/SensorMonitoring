@@ -106,6 +106,7 @@ public class TcpSensorServer : BackgroundService
                             continue;
                         }
 
+                        // Application에서 처리할 수 있도록 Channel에 전달
                         await _channel.WriteAsync(
                             packet,
                             cancellationToken);

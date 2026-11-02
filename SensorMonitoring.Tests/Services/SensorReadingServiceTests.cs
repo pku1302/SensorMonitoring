@@ -14,16 +14,21 @@ public class SensorReadingServiceTests
     public async Task GetRecentAsync_WhenSensorDoseNotExist_ReturnsNull()
     {
         // Arrange
+        var ct = TestContext.Current.CancellationToken;
+
         using var testDb = new TestDbContext();
 
+        await using var dbContext =
+            testDb.CreateContext();
+
         var service =
-            new SensorReadingService(testDb.Context);
+            new SensorReadingService(dbContext);
 
         // Act
         var result =
              await service.GetRecentAsync(
                  "Sensor-999",
-                 CancellationToken.None);
+                 ct);
 
         // Assert
         Assert.Null(result);
@@ -35,6 +40,9 @@ public class SensorReadingServiceTests
         // Arrange
         using var testDb = new TestDbContext();
 
+        await using var dbContext =
+            testDb.CreateContext();
+
         var sensor = new Sensor
         {
             DeviceId = "Sensor-001",
@@ -42,12 +50,12 @@ public class SensorReadingServiceTests
             IsEnabled = true
         };
 
-        testDb.Context.Sensors.Add(sensor);
+        dbContext.Sensors.Add(sensor);
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
 
         var service =
-            new SensorReadingService(testDb.Context);
+            new SensorReadingService(dbContext);
 
         // Act
         var result =
@@ -66,6 +74,9 @@ public class SensorReadingServiceTests
         // Arrange
         using var testDb = new TestDbContext();
 
+        await using var dbContext =
+            testDb.CreateContext();
+
         var sensor = new Sensor
         {
             DeviceId = "Sensor-001",
@@ -73,11 +84,11 @@ public class SensorReadingServiceTests
             IsEnabled = true
         };
 
-        testDb.Context.Sensors.Add(sensor);
+        dbContext.Sensors.Add(sensor);
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
 
-        testDb.Context.SensorReadings.Add(
+        dbContext.SensorReadings.Add(
             new SensorReading
             {
                 SensorId = sensor.Id,
@@ -87,10 +98,10 @@ public class SensorReadingServiceTests
                 RecordedAt = DateTime.UtcNow.AddSeconds(-30)
             });
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
 
         var service =
-            new SensorReadingService(testDb.Context);
+            new SensorReadingService(dbContext);
 
         // Act
         var result =
@@ -113,6 +124,9 @@ public class SensorReadingServiceTests
         // Arrange
         using var testDb = new TestDbContext();
 
+        await using var dbContext =
+            testDb.CreateContext();
+
         var sensor = new Sensor
         {
             DeviceId = "Sensor-001",
@@ -120,11 +134,11 @@ public class SensorReadingServiceTests
             IsEnabled = true
         };
 
-        testDb.Context.Sensors.Add(sensor);
+        dbContext.Sensors.Add(sensor);
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
 
-        testDb.Context.SensorReadings.AddRange(
+        dbContext.SensorReadings.AddRange(
             new SensorReading
             {
                 SensorId = sensor.Id,
@@ -142,10 +156,10 @@ public class SensorReadingServiceTests
                 RecordedAt = DateTime.UtcNow.AddMinutes(-5)
             });
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
 
         var service =
-            new SensorReadingService(testDb.Context);
+            new SensorReadingService(dbContext);
 
         // Act
         var result =

@@ -12,6 +12,6 @@ public class SensorAlarmHistory
     public string AlarmCode { get; set; } = string.Empty;
     public string AlarmMessage { get; set; } = string.Empty;
     public DateTime OccurredAt { get; set; }
-    public DateTime? CleareaAt { get; set; }
+    public DateTime? ClearedAt { get; set; }
 
 }

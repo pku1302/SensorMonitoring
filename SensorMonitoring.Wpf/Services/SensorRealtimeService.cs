@@ -8,11 +8,12 @@ namespace SensorMonitoring.Wpf.Services;
 public class SensorRealtimeService : ISensorRealtimeService
 {
     private readonly HubConnection _connection;
-
     public string ConnectionStatus { get; private set; }
         = "Disconnected";
     public event Action<SensorRealTimeDto>? SensorUpdated;
     public event Action<string>? ConnectionStatusChanged;
+    public event Action<SensorAlarmChangedDto>? AlarmChanged;
+
     public SensorRealtimeService(
         IOptions<ServerOptions> options)
     {
@@ -30,6 +31,10 @@ public class SensorRealtimeService : ISensorRealtimeService
             {
                 SensorUpdated?.Invoke(dto);
             });
+
+        _connection.On<SensorAlarmChangedDto>(
+            "AlarmChanged",
+            dto => AlarmChanged?.Invoke(dto));
 
         _connection.Reconnecting += ex =>
         {

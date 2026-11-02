@@ -1,10 +1,10 @@
-﻿using SensorMonitoring.Api.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using Moq;
+using SensorMonitoring.Api.Services;
 using SensorMonitoring.Contracts;
 using SensorMonitoring.Domain.Entities;
+using SensorMonitoring.Infrastructure.Data;
 using SensorMonitoring.Tests.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SensorMonitoring.Tests.Services;
 
@@ -14,34 +14,50 @@ public class SensorCacheStatusTests
     public async Task DbAlarmSetting_IsLoadedIntoCache_AndUsedForStatusEvaluation()
     {
         // Arrange
+        var ct = TestContext.Current.CancellationToken;
+        
         using var testDb = new TestDbContext();
-
-        var sensor = new Sensor
+        
+        await using (var dbContext = testDb.CreateContext())
         {
-            DeviceId = "Sensor-001",
-            Name = "Sensor 1",
-            IsEnabled = true,
-
-            AlarmSetting = new SensorAlarmSetting
+            var sensor = new Sensor
             {
+                DeviceId = "Sensor-001",
+                Name = "Sensor 1",
                 IsEnabled = true,
 
-                TemperatureWarning = 28,
-                TemperatureDanger = 32,
+                AlarmSetting = new SensorAlarmSetting
+                {
+                    IsEnabled = true,
 
-                HumidityWarning = 60,
-                HumidityDanger = 75
-            }
-        };
+                    TemperatureWarning = 28,
+                    TemperatureDanger = 32,
 
-        testDb.Context.Sensors.Add(sensor);
+                    HumidityWarning = 60,
+                    HumidityDanger = 75
+                }
+            };
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+            dbContext.Sensors.Add(sensor);
 
-        var cache = new SensorIdCache();
+            await dbContext.SaveChangesAsync(ct);
+        }
+
+        var cache =
+            new SensorIdCache();
+
+        var dbContextFactory =
+            new Mock<IDbContextFactory<MonitoringDbContext>>();
+
+        dbContextFactory
+            .Setup(x => x.CreateDbContextAsync(
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => testDb.CreateContext());
 
         var cacheService =
-            new SensorCacheService(cache);
+            new SensorCacheService(
+                cache,
+                dbContextFactory.Object);
 
         var statusService =
             new SensorStatusService();
@@ -50,8 +66,8 @@ public class SensorCacheStatusTests
         var sensorInfo =
             await cacheService.GetAsync(
                 "Sensor-001",
-                testDb.Context,
-                CancellationToken.None);
+                0,
+                ct);
 
         Assert.NotNull(sensorInfo);
 
@@ -67,6 +83,10 @@ public class SensorCacheStatusTests
             cache.TryGet(
                 "Sensor-001",
                 out var cacheItem));
+
+        Assert.Equal(
+            0,
+            sensorInfo.TotalProduction);
 
         var status =
             statusService.Evaluate(
@@ -85,33 +105,46 @@ public class SensorCacheStatusTests
     {
         using var testDb = new TestDbContext();
 
-        var sensor = new Sensor
+        // 초기 데이터 삽입
+        await using (var dbContext = testDb.CreateContext())
         {
-            DeviceId = "SENSOR-001",
-            Name = "Sensor 1",
+            dbContext.Sensors.Add(
+                new Sensor
+                {
+                    DeviceId = "SENSOR-001",
+                    Name = "Sensor 1",
 
-            AlarmSetting = new SensorAlarmSetting
-            {
-                IsEnabled = true,
-                TemperatureWarning = 28,
-                TemperatureDanger = 32
-            }
-        };
+                    AlarmSetting = new SensorAlarmSetting
+                    {
+                        IsEnabled = true,
+                        TemperatureWarning = 28,
+                        TemperatureDanger = 32
+                    }
+                });
 
-        testDb.Context.Sensors.Add(sensor);
-
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+            await dbContext.SaveChangesAsync(CancellationToken.None);
+        }
 
         var cache = new SensorIdCache();
 
+        var factoryMock =
+            new Mock<IDbContextFactory<MonitoringDbContext>>();
+
+        factoryMock
+            .Setup(x => x.CreateDbContextAsync(
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => testDb.CreateContext());
+
         var cacheService =
-            new SensorCacheService(cache);
+            new SensorCacheService(
+                cache,
+                factoryMock.Object);
 
         // 첫 조회 → DB → Cache
         var first =
             await cacheService.GetAsync(
                 "SENSOR-001",
-                testDb.Context,
+                0,
                 CancellationToken.None);
 
         Assert.Equal(
@@ -119,15 +152,28 @@ public class SensorCacheStatusTests
             first!.SensorAlarmSetting!.TemperatureWarning);
 
         // DB 값 변경
-        sensor.AlarmSetting!.TemperatureWarning = 20;
+        await using (var dbContext = testDb.CreateContext())
+        {
+            var cancellationToken =
+                TestContext.Current.CancellationToken;
 
-        await testDb.Context.SaveChangesAsync(CancellationToken.None);
+            var sensor =
+                await dbContext.Sensors
+                    .Include(x => x.AlarmSetting)
+                    .FirstAsync(
+                        x => x.DeviceId == "SENSOR-001",
+                        cancellationToken);
+
+            sensor.AlarmSetting!.TemperatureWarning = 20;
+
+            await dbContext.SaveChangesAsync(CancellationToken.None);
+        }
 
         // 두 번째 조회
         var second =
             await cacheService.GetAsync(
                 "SENSOR-001",
-                testDb.Context,
+                0,
                 CancellationToken.None);
 
         // 캐시가 남아 있으므로 28

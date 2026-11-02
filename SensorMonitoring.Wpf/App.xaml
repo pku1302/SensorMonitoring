@@ -23,6 +23,9 @@
 
                 <ResourceDictionary 
                     Source="/Styles/Themes.xaml"/>
+                
+                <ResourceDictionary
+                    Source="/Styles/CalendarStyles.xaml"/>
 
             </ResourceDictionary.MergedDictionaries>
 

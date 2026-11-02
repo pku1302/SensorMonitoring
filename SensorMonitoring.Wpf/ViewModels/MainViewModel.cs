@@ -1,41 +1,55 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace SensorMonitoring.Wpf.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
-    private object currentViewModel;
+    private ObservableObject currentView;
 
-    public DashboardViewModel DashboardViewModel { get; }
-    public SidebarViewModel SidebarViewModel { get; }
-    public StatusBarViewModel StatusBarViewModel { get; }
+    public DashboardViewModel Dashboard { get; }
+    public DataHistoryViewModel DataHistory { get; }
+    public AlarmHistoryViewModel AlarmHistory { get; }
+    public SensorSettingsViewModel SensorSettings { get; }
+
+    public SidebarViewModel Sidebar { get; }
+    public StatusBarViewModel StatusBar { get; }
 
     public MainViewModel(
         SidebarViewModel sidebar,
         StatusBarViewModel statusBar,
-        DashboardViewModel dashboard)
+        DashboardViewModel dashboard,
+        DataHistoryViewModel dataHistory,
+        AlarmHistoryViewModel alarmHistory,
+        SensorSettingsViewModel sensorSettings)
     {
-        SidebarViewModel = sidebar;
-        StatusBarViewModel = statusBar;
-        DashboardViewModel = dashboard;
+        Sidebar = sidebar;
+        StatusBar = statusBar;
+        Dashboard = dashboard;
+        DataHistory = dataHistory;
+        AlarmHistory = alarmHistory;
+        SensorSettings = sensorSettings;
 
-        CurrentViewModel = DashboardViewModel;
+        AlarmHistory = alarmHistory;
+        SensorSettings = sensorSettings;
 
-        SidebarViewModel.NavigationRequested +=
+        Sidebar.NavigationRequested +=
             OnNavigationRequested;
+
+        CurrentView = Dashboard;
     }
     private void OnNavigationRequested(
         string destination)
     {
-        CurrentViewModel = destination switch
+        CurrentView = destination switch
         {
-            "Dashboard" => DashboardViewModel,
-            "Sensors" => DashboardViewModel,
-            "Alarms" => DashboardViewModel,
-            "Settings" => DashboardViewModel,
+            "Dashboard" => Dashboard,
+            "DataHistory" => DataHistory,
+            "AlarmHistory" => AlarmHistory,
+            "SensorSettings" => SensorSettings,
 
-            _ => DashboardViewModel
+            _ => Dashboard
         };
     }
 }

@@ -5,15 +5,112 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
              mc:Ignorable="d">
-    <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,0" Padding="12,24">
+    <UserControl.Resources>
+
+        <Style x:Key="SidebarMenuStyle"
+           TargetType="RadioButton">
+
+            <Setter Property="Background"
+                Value="Transparent"/>
+
+            <Setter Property="Foreground"
+                Value="{StaticResource MutedBrush}"/>
+
+            <Setter Property="FontWeight"
+                Value="Normal"/>
+
+            <Setter Property="Margin"
+                Value="0,0,0,6"/>
+
+            <Setter Property="Padding"
+                Value="12"/>
+
+            <Setter Property="Cursor"
+                Value="Hand"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+
+                        <Border x:Name="MenuBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="5"
+                            Padding="{TemplateBinding Padding}">
+
+                            <ContentPresenter
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+
+                            <!-- 선택 -->
+                            <Trigger Property="IsChecked"
+                                 Value="True">
+
+                                <Setter TargetName="MenuBorder"
+                                    Property="Background"
+                                    Value="#EAF1FF"/>
+
+                                <Setter Property="Foreground"
+                                    Value="{StaticResource AccentBrush}"/>
+
+                                <Setter Property="FontWeight"
+                                    Value="SemiBold"/>
+                            </Trigger>
+
+                            <!-- 마우스 오버 -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver"
+                                           Value="True"/>
+                                    <Condition Property="IsChecked"
+                                           Value="False"/>
+                                </MultiTrigger.Conditions>
+
+                                <Setter TargetName="MenuBorder"
+                                    Property="Background"
+                                    Value="#F1F5F9"/>
+                            </MultiTrigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource SurfaceBrush}"
+        BorderBrush="{StaticResource LineBrush}"
+        BorderThickness="0,0,1,0"
+        Padding="12,24">
+
         <StackPanel>
-            <Border Background="#EAF1FF" CornerRadius="5" Padding="12" Margin="0,0,0,6">
-                <TextBlock Text="대시보드" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold"/>
-            </Border>
-            <TextBlock Text="데이터 이력" Margin="12,12" Style="{StaticResource MutedText}"/>
-            <TextBlock Text="알람 이력" Margin="12,12" Style="{StaticResource MutedText}"/>
-            <TextBlock Text="센서 설정" Margin="12,12" Style="{StaticResource MutedText}"/>
-            <TextBlock Text="다른 메뉴는 화면 구성 예시입니다." TextWrapping="Wrap" Margin="12,24,12,0" Style="{StaticResource MutedText}"/>
+
+            <RadioButton Content="대시보드"
+                     GroupName="SidebarNavigation"
+                     Style="{StaticResource SidebarMenuStyle}"
+                     IsChecked="True"
+                     Command="{Binding NavigateDashboardCommand}"/>
+
+            <RadioButton Content="데이터 이력"
+                     GroupName="SidebarNavigation"
+                     Style="{StaticResource SidebarMenuStyle}"
+                     Command="{Binding NavigateDataHistoryCommand}"/>
+
+            <RadioButton Content="알람 이력"
+                     GroupName="SidebarNavigation"
+                     Style="{StaticResource SidebarMenuStyle}"
+                     Command="{Binding NavigateAlarmHistoryCommand}"/>
+
+            <RadioButton Content="센서 설정"
+                     GroupName="SidebarNavigation"
+                     Style="{StaticResource SidebarMenuStyle}"
+                     Command="{Binding NavigateSensorSettingsCommand}"/>
+
         </StackPanel>
     </Border>
 </UserControl>

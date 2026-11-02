@@ -15,6 +15,18 @@
         <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
             <views:DashboardView/>
         </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type vm:DataHistoryViewModel}">
+            <views:DataHistoryView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:AlarmHistoryViewModel}">
+            <views:AlarmHistoryView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:SensorSettingsViewModel}">
+            <views:SensorSettingsView/>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -32,8 +44,13 @@
                 <TextBlock Text="WPF · 샘플 데이터" Margin="16,2,0,0" Style="{StaticResource MutedText}"/>
             </StackPanel>
         </Border>
-        <controls:Sidebar Grid.Row="1"/>
-        <views:DashboardView Grid.Row="1" Grid.Column="1" DataContext="{Binding DashboardViewModel}"/>
+        <controls:Sidebar 
+            Grid.Row="1"
+            DataContext="{Binding Sidebar}"/>
+        <ContentControl 
+            Grid.Row="1"
+            Grid.Column="1"
+            Content="{Binding CurrentView}"/>
         <controls:ConnectionStatusBar Grid.Row="2" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>
