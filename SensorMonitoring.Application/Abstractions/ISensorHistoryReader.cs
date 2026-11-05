@@ -1,4 +1,5 @@
-﻿using SensorMonitoring.Contracts;
+﻿using SensorMonitoring.Application.Models;
+using SensorMonitoring.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,4 +24,10 @@ public interface ISensorHistoryReader
         DateTime startUtc,
         DateTime endUtc,
         CancellationToken ct);
+
+    Task<List<SensorHistoryReadingData>> GetHourlyReadingAsync(
+        DateTime startUtc,
+        DateTime endUtc,
+        string? deviceId,
+        CancellationToken cancellationToken);
 }

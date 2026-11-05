@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SensorMonitoring.Application.Abstractions;
+using SensorMonitoring.Application.Models;
 using SensorMonitoring.Contracts;
 using SensorMonitoring.Infrastructure.Data;
 using System;
@@ -134,5 +135,47 @@ public class SensorHistoryReader : ISensorHistoryReader
                 MaxHumidity = x.MaxHumidity
             }).ToList()
         };
+    }
+
+    public async Task<List<SensorHistoryReadingData>> GetHourlyReadingAsync(
+        DateTime startUtc,
+        DateTime endUtc,
+        string? deviceId,
+        CancellationToken cancellationToken)
+    {
+        var query =
+            from reading in _dbContext.SensorReadings.AsNoTracking()
+            join sensor in _dbContext.Sensors.AsNoTracking()
+                on reading.SensorId equals sensor.Id
+            where reading.RecordedAt >= startUtc
+                && reading.RecordedAt < endUtc
+            select new
+            {
+                reading.Id,
+                reading.RecordedAt,
+                sensor.DeviceId,
+                reading.Temperature,
+                reading.Humidity,
+                sensor.AlarmSetting
+            };
+
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            query = query.Where(x => x.DeviceId == deviceId);
+        }
+
+        var readings = await query
+            .OrderByDescending(x => x.RecordedAt)
+            .ThenByDescending(x => x.Id)
+            .ToListAsync(cancellationToken);
+
+        return readings.Select(x => new SensorHistoryReadingData
+        {
+            RecordedAt = x.RecordedAt,
+            DeviceId = x.DeviceId,
+            Temperature = x.Temperature,
+            Humidity = x.Humidity,
+            AlarmSetting = x.AlarmSetting
+        }).ToList();
     }
 }

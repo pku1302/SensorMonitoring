@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SensorMonitoring.Contracts;
 using SensorMonitoring.Contractsl;
 using SensorMonitoring.Wpf.Services;
@@ -18,9 +19,9 @@ public partial class DataHistoryViewModel : ObservableObject
         _sensorHistoryApiService;
     public CalendarViewModel Calendar { get; } = new();
     public SensorSelectionViewModel SensorSelection { get; } = new();
-
     public HistoryChartViewModel TemperatureChart { get; } = new();
     public HistoryChartViewModel HumidityChart { get; } = new();
+    public SensorDataGridViewModel SensorDataGrid { get; }
 
     private bool _initialized;
 
@@ -28,6 +29,8 @@ public partial class DataHistoryViewModel : ObservableObject
         ISensorHistoryApiService sensorHistoryApiService)
     {
         _sensorHistoryApiService = sensorHistoryApiService;
+
+        SensorDataGrid = new(_sensorHistoryApiService);
 
         Calendar.PropertyChanged += OnCalendarPropertyChanged;
 
@@ -42,9 +45,16 @@ public partial class DataHistoryViewModel : ObservableObject
 
         _initialized = true;
 
+        SensorDataGrid.SetConditions(
+            Calendar.SelectedDate is DateTime date
+                ? DateOnly.FromDateTime(date)
+                : null,
+            SensorSelection.SelectedSensor?.DeviceId);
+
         // 현재 달력의 선택 날짜를 이용해 최초 API 요청
         LoadSelectedDate();
     }
+
     private void LoadSelectedDate()
     {
         _sensorLoadCts?.Cancel();
@@ -73,7 +83,14 @@ public partial class DataHistoryViewModel : ObservableObject
         // 1. 이전 차트 취소 및 초기화
         CancelAndClearChart();
 
-        // 2. 이전 날짜의 선택 센서 해제
+        // 2. 데이터 표 요청 취소 및 초기화
+        SensorDataGrid.SetConditions(
+            Calendar.SelectedDate is DateTime selectedDate
+                ? DateOnly.FromDateTime(selectedDate)
+                : null,
+            null);
+
+        // 3. 이전 날짜의 선택 센서 해제
         SensorSelection.SelectedSensor = null;
 
         if (Calendar.SelectedDate is DateTime date)
@@ -95,6 +112,7 @@ public partial class DataHistoryViewModel : ObservableObject
         LoadSelectedDate();
     }
 
+
     private void OnSensorSelectionPropertyChanged(
         object? sender,
         PropertyChangedEventArgs e)
@@ -103,8 +121,17 @@ public partial class DataHistoryViewModel : ObservableObject
             nameof(SensorSelectionViewModel.SelectedSensor))
             return;
 
+        // 기존 차트 조회
         LoadSelectedChart();
+
+        // 데이터 표 조회 조건 전달
+        SensorDataGrid.SetConditions(
+            Calendar.SelectedDate is DateTime date
+                ? DateOnly.FromDateTime(date)
+                : null,
+            SensorSelection.SelectedSensor?.DeviceId);
     }
+
     private void CancelAndClearChart()
     {
         _chartLoadCts?.Cancel();
@@ -112,6 +139,7 @@ public partial class DataHistoryViewModel : ObservableObject
         TemperatureChart.Clear();
         HumidityChart.Clear();
     }
+
     private void LoadSelectedChart()
     {
         _chartLoadCts?.Cancel();
@@ -137,6 +165,7 @@ public partial class DataHistoryViewModel : ObservableObject
             DateOnly.FromDateTime(date.Value),
             cts);
     }
+
     private async Task LoadChartAsync(
         string deviceId,
         DateOnly date,

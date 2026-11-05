@@ -36,6 +36,8 @@
 
             <chart:SensorChart
                 DataContext="{Binding HumidityChart}"/>
+            <controls:SensorDataGridView 
+                DataContext="{Binding SensorDataGrid}"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

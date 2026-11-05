@@ -1,0 +1,352 @@
+﻿<UserControl x:Class="SensorMonitoring.Wpf.Views.Controls.SensorDataGridView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SensorMonitoring.Wpf.Views.Controls"
+             xmlns:views="clr-namepsace:SensorMonitoring.Wpf.Views"
+             mc:Ignorable="d">
+    <Grid Background="{StaticResource PageBrush}"
+          Margin="0">
+
+        <Border Style="{StaticResource Panel}"
+                Margin="16"
+                VerticalAlignment="Top">
+
+            <Grid VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 상단 제목 -->
+                <!-- 상단 제목 및 상태 필터 -->
+                <Grid Grid.Row="0"
+                      Margin="0,0,0,16">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 첫 번째 줄: 제목 -->
+                    <Grid Grid.Row="0">
+
+                        <StackPanel Orientation="Horizontal">
+
+                            <TextBlock
+                                Text="측정 데이터"
+                                Style="{StaticResource SectionTitle}"/>
+                            <TextBlock
+                                Margin="8,0,0,0"
+                                Style="{StaticResource MutedText}"
+                                VerticalAlignment="Center">
+                                <Run Text="{Binding TotalCount, Mode=OneWay}"/>
+                            </TextBlock>
+
+                            <!-- 전체 개수 -->
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource MutedText}">
+
+                                <Run Text="/ "/>
+                                <Run Text="{Binding AllCount, Mode=OneWay}"/>
+                                <Run Text="건"/>
+                            </TextBlock>
+                        </StackPanel>
+
+                        <TextBlock
+                            Text="측정 시간 내림차순 · 8건씩"
+                            Style="{StaticResource MutedText}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- 두 번째 줄: 상태 필터 -->
+                    <Grid Grid.Row="1"
+                          Margin="0,14,0,0">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- 왼쪽: 기존 상태 필터 -->
+                        <StackPanel Grid.Column="0"
+                                    Orientation="Horizontal">
+                            <Button
+                            Command="{Binding ChangeFilterCommand}"
+                            CommandParameter="All"
+                            Style="{StaticResource AllFilterButton}">
+                                <TextBlock Text="전체"
+                                       Foreground="{Binding Foreground,
+                                            RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Button>
+
+                            <Button Command="{Binding ChangeFilterCommand}"
+                                CommandParameter="Normal"
+                                Style="{StaticResource NormalFilterButton}">
+
+                                <TextBlock Text="정상"
+                                        Foreground="{Binding Foreground,
+                                            RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Button>
+
+                            <Button Command="{Binding ChangeFilterCommand}"
+                                CommandParameter="Danger"
+                                Style="{StaticResource DangerFilterButton}">
+
+                                <TextBlock Text="위험"
+                                        Foreground="{Binding Foreground,
+                                             RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- 오른쪽: 시간대 조회 -->
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+
+                            <ComboBox
+                                Width="85"
+                                Height="32"
+                                ItemsSource="{Binding HourOptions}"
+                                Style="{StaticResource HistoryHourComboBox}"
+                                SelectedItem="{Binding SelectedHour}"
+                                ItemContainerStyle="{StaticResource HistoryHourComboBoxItem}"
+                                Margin="0,0,8,0">
+
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Text="{Binding Converter={StaticResource HourRangeConverter}}"
+                                            FontSize="13"
+                                            VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <Button
+                                Command="{Binding SearchByHourCommand}"
+                                Style="{StaticResource HistorySearchButton}">
+                                <TextBlock Text="조회"
+                                           Foreground="White"
+                                           FontWeight="SemiBold"/>
+                            </Button>
+
+                        </StackPanel>
+
+                    </Grid>
+                </Grid>
+
+                <!-- 이력 목록 -->
+                <DataGrid
+                    Grid.Row="1"
+                    ItemsSource="{Binding Histories}"
+                    Style="{StaticResource HistoryDataGrid}"
+                    ColumnHeaderStyle="{StaticResource HistoryColumnHeader}"
+                    CellStyle="{StaticResource HistoryCell}"
+                    RowStyle="{StaticResource HistoryRow}"
+                    Sorting="HistoryDataGrid_Sorting"
+                    CanUserSortColumns="True"
+                    Height="395">
+
+                    <DataGrid.Columns>
+
+                        <DataGridTextColumn
+                                Width="2*"
+                                SortMemberPath="MeasuredAt"
+                                ElementStyle="{StaticResource HistoryCellText}"
+                                Binding="{Binding MeasuredAt, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}">
+
+                            <DataGridTextColumn.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="측정 시간"
+                                               VerticalAlignment="Center"/>
+
+                                    <Path Grid.Column="1"
+                                               Style="{StaticResource SortArrowStyle}"
+                                               Margin="8,0,0,0"/>
+                                </Grid>
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn
+                            Header="센서"
+                            Width="*"
+                            CanUserSort="False"
+                            ElementStyle="{StaticResource HistoryCellText}"
+                            Binding="{Binding SensorId}"/>
+
+                        <DataGridTextColumn
+                                Width="*"
+                                SortMemberPath="Temperature"
+                                ElementStyle="{StaticResource HistoryCellText}"
+                                Binding="{Binding Temperature, StringFormat={}{0:F1}}">
+
+                            <DataGridTextColumn.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="온도 (°C)"
+                                               VerticalAlignment="Center"/>
+
+                                    <Path Grid.Column="1"
+                                               Style="{StaticResource SortArrowStyle}"
+                                               Margin="8,0,0,0"/>
+                                </Grid>
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <!-- 습도 추가 -->
+                        <DataGridTextColumn
+                                Width="*"
+                                SortMemberPath="Humidity"
+                                ElementStyle="{StaticResource HistoryCellText}"
+                                Binding="{Binding Humidity, StringFormat={}{0:F1}}">
+
+                            <DataGridTextColumn.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Grid.Column="0"
+                                               Text="습도 (%)"
+                                               VerticalAlignment="Center"/>
+
+                                    <Path Grid.Column="1"
+                                               Style="{StaticResource SortArrowStyle}"
+                                               Margin="8,0,0,0"/>
+                                </Grid>
+                            </DataGridTextColumn.Header>
+                        </DataGridTextColumn>
+
+                        <DataGridTemplateColumn
+                            Header="측정 당시 상태"
+                            Width="1.5*">
+
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+
+                                    <StackPanel Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                Margin="12,0,0,0">
+
+                                        <Ellipse x:Name="StatusDot"
+                                                 Width="6"
+                                                 Height="6"
+                                                 Margin="0,0,6,0"
+                                                 VerticalAlignment="Center"
+                                                 Fill="{StaticResource MutedBrush}"/>
+
+                                        <TextBlock x:Name="StatusLabel"
+                                                   Text="수신 끊김"
+                                                   Foreground="{StaticResource MutedBrush}"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"/>
+
+                                    </StackPanel>
+
+                                    <DataTemplate.Triggers>
+
+                                        <DataTrigger Binding="{Binding Status}"
+                                                    Value="Normal">
+                                            <Setter TargetName="StatusDot"
+                                                    Property="Fill"
+                                                    Value="{StaticResource NormalBrush}"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Text"
+                                                    Value="정상"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Foreground"
+                                                    Value="{StaticResource NormalBrush}"/>
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding Status}"
+                                                    Value="Warning">
+                                            <Setter TargetName="StatusDot"
+                                                    Property="Fill"
+                                                    Value="{StaticResource WarningBrush}"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Text"
+                                                    Value="주의"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Foreground"
+                                                    Value="{StaticResource WarningBrush}"/>
+                                        </DataTrigger>
+
+                                        <DataTrigger Binding="{Binding Status}"
+                                                    Value="Danger">
+                                            <Setter TargetName="StatusDot"
+                                                    Property="Fill"
+                                                    Value="{StaticResource DangerBrush}"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Text"
+                                                    Value="위험"/>
+                                            <Setter TargetName="StatusLabel"
+                                                    Property="Foreground"
+                                                    Value="{StaticResource DangerBrush}"/>
+                                        </DataTrigger>
+
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+
+                </DataGrid>
+
+                <!-- 하단 페이지네이션 -->
+                <Grid Grid.Row="2"
+                      Margin="0,16,0,0">
+
+                    <TextBlock
+                        Text="{Binding RangeInfo}"
+                        Style="{StaticResource MutedText}"
+                        VerticalAlignment="Center"/>
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+
+                        <Button
+                            Content="이전"
+                            Command="{Binding PreviousPageCommand}"
+                            IsEnabled="{Binding CanGoPrevious}"
+                            Style="{StaticResource HistoryPageButton}"/>
+
+                        <TextBlock
+                            Text="{Binding PageInfo}"
+                            Margin="14,0"
+                            VerticalAlignment="Center"/>
+
+                        <Button
+                            Content="다음"
+                            Command="{Binding NextPageCommand}"
+                            IsEnabled="{Binding CanGoNext}"
+                            Style="{StaticResource HistoryPageButton}"/>
+
+                    </StackPanel>
+                </Grid>
+
+            </Grid>
+        </Border>
+    </Grid>
+
+</UserControl>

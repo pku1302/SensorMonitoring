@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SensorMonitoring.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,5 +20,6 @@ public class SensorReading
     public long TotalProduction { get; set; }
 
     public DateTime RecordedAt { get; set; }
+
 
 }

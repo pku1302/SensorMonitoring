@@ -26,4 +26,25 @@ public static class KoreaDateRange
 
         return (startUtc, endUtc);
     }
+
+    public static (
+        DateTime StartUtc, DateTime EndUtc
+        ) ToUtcHour(DateOnly date, int hour)
+    {
+        if (hour is < 0 or > 23)
+            throw new ArgumentOutOfRangeException(nameof(hour));
+
+        var koreaTimeZone =
+            TimeZoneInfo.FindSystemTimeZoneById("Asia/Seoul");
+
+        var startKst = DateTime.SpecifyKind(
+            date.ToDateTime(new TimeOnly(hour, 0)),
+            DateTimeKind.Unspecified);
+
+        var endKst = startKst.AddHours(1);
+
+        return (
+            TimeZoneInfo.ConvertTimeToUtc(startKst, koreaTimeZone),
+            TimeZoneInfo.ConvertTimeToUtc(endKst, koreaTimeZone));
+    }
 }

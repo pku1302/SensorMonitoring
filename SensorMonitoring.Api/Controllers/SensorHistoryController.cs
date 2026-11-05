@@ -63,4 +63,27 @@ public class SensorHistoryController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("history/readings")]
+    public async Task<ActionResult<List<SensorHistoryReadingDto>>>
+        GetHourlyReadingsAsync(
+            [FromQuery] DateOnly date,
+            [FromQuery] int hour,
+            [FromQuery] string? deviceId,
+            CancellationToken cancellationToken)
+    {
+        if (hour is < 0 or > 23)
+        {
+            return BadRequest(
+                "hour는 0부터 23까지 입력해야 합니다.");
+        }
+
+        var readings = await _historyService.GetHourlyReadingAsync(
+            date,
+            hour,
+            deviceId,
+            cancellationToken);
+
+        return Ok(readings);
+    }
 }

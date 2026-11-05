@@ -1,9 +1,9 @@
 ﻿using SensorMonitoring.Application.Abstractions;
 using SensorMonitoring.Application.Common;
+using SensorMonitoring.Application.Mappings;
 using SensorMonitoring.Contracts;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SensorMonitoring.Domain.Enums;
+
 
 namespace SensorMonitoring.Application.Services;
 
@@ -44,5 +44,38 @@ public class SensorHistoryService
 
         return _reader.GetChartAsync(
             deviceId, start, end, ct);
+    }
+
+    public async Task<List<SensorHistoryReadingDto>> GetHourlyReadingAsync(
+        DateOnly date,
+        int hour,
+        string? deviceId,
+        CancellationToken cancellationToken = default)
+    {
+        var (startUtc, endUtc) =
+            KoreaDateRange.ToUtcHour(date, hour);
+
+        var readings = await _reader.GetHourlyReadingAsync(
+            startUtc,
+            endUtc,
+            deviceId,
+            cancellationToken);
+
+        return readings.Select(x =>
+        {
+            var status = SensorStatusEvaluator.Evaluate(
+                x.Temperature,
+                x.Humidity,
+                x.AlarmSetting);
+
+            return new SensorHistoryReadingDto
+            {
+                MeasuredAt = x.RecordedAt,
+                SensorId = x.DeviceId,
+                Temperature = x.Temperature,
+                Humidity = x.Humidity,
+                Status = SensorStatusMapper.ToDto(status)
+            };
+        }).ToList();
     }
 }

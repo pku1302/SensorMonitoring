@@ -46,4 +46,25 @@ public class SensorHistoryApiService : ISensorHistoryApiService
                 ?? new SensorHistoryChartDto();
     }
 
+    public async Task<List<SensorHistoryReadingDto>>
+        GetHourlyReadingsAsync(
+            DateOnly date,
+            int hour,
+            string? deviceId = null,
+            CancellationToken cancellationToken = default)
+    {
+        string url =
+            $"api/sensors/history/readings" +
+            $"?date={date:yyyy-MM-dd}&hour={hour}";
+
+        if (!string.IsNullOrWhiteSpace(deviceId))
+        {
+            url += $"&deviceId={Uri.EscapeDataString(deviceId)}";
+        }
+
+        return await _httpClient
+            .GetFromJsonAsync<List<SensorHistoryReadingDto>>(
+                url, cancellationToken)
+            ?? new List<SensorHistoryReadingDto>();
+    }
 }

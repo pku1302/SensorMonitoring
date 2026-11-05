@@ -3,6 +3,20 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# EF Core migration bundle
+/efbundle
+/efbundle.exe
+
+# Docker image archives
+/sensor-monitoring-api*.tar
+
+# .NET build outputs
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+
 # User-specific files
 *.rsuser
 *.suo
